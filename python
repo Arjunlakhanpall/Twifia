@@ -1,0 +1,60 @@
+from flask import Flask, jsonify, request
+import datetime
+
+app = Flask(__name__)
+
+# Sample data structure to store user expenses
+users = {}
+
+# Sample data structure to store financial goals
+financial_goals = {}
+
+# Sample data structure to store stock information
+stocks = {}
+
+# Route for adding expenses
+@app.route('/add_expense', methods=['POST'])
+def add_expense():
+    data = request.json
+    user_id = data.get('user_id')
+    amount = data.get('amount')
+    category = data.get('category')
+    timestamp = datetime.datetime.now()
+
+    if user_id not in users:
+        users[user_id] = []
+
+    users[user_id].append({
+        'amount': amount,
+        'category': category,
+        'timestamp': timestamp
+    })
+
+    return jsonify({'message': 'Expense added successfully'}), 200
+
+# Route for setting financial goals
+@app.route('/set_goal', methods=['POST'])
+def set_goal():
+    data = request.json
+    user_id = data.get('user_id')
+    goal_type = data.get('goal_type')
+    amount = data.get('amount')
+
+    financial_goals[user_id] = {
+        'goal_type': goal_type,
+        'amount': amount
+    }
+
+    return jsonify({'message': 'Financial goal set successfully'}), 200
+
+# Route for getting stock information
+@app.route('/get_stock', methods=['GET'])
+def get_stock():
+    stock_name = request.args.get('stock_name')
+    if stock_name in stocks:
+        return jsonify(stocks[stock_name])
+    else:
+        return jsonify({'error': 'Stock not found'}), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
